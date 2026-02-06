@@ -1,3 +1,30 @@
+:root {
+  /* Minimal neutral theme tokens */
+  --bg: #f8fafc;
+  --surface: #ffffff;
+  --text: #111827;
+  --muted: rgba(17, 24, 39, 0.7);
+  --border: #e5e7eb;
+
+  /* Subtle interactive states */
+  --hover: #f3f4f6;
+  --focus: rgba(17, 24, 39, 0.2);
+
+  /* Spacing + shape */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+
+  --radius: 12px;
+  --radius-sm: 10px;
+
+  /* Typography */
+  --font-sans: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New",
+    monospace;
+}
+
 html,
 body {
   height: 100%;
@@ -5,9 +32,10 @@ body {
 
 body {
   margin: 0;
-  background: #f9fafb;
-  color: #111827;
-  font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+  line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -18,9 +46,15 @@ body {
 
 button {
   font: inherit;
+  color: inherit;
 }
 
 code {
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New",
-    monospace;
+  font-family: var(--font-mono);
+}
+
+/* Keep focus visible for keyboard users (don’t remove outlines globally) */
+:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 3px;
 }

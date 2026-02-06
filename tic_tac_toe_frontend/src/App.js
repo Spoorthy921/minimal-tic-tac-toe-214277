@@ -76,7 +76,7 @@ function App() {
       <main className="game-shell">
         <header className="game-header">
           <h1 className="game-title">Tic-Tac-Toe</h1>
-          <p className="game-subtitle">Retro grid. Clean rules. No quarters required.</p>
+          <p className="game-subtitle">A simple, minimal Tic-Tac-Toe.</p>
         </header>
 
         <section className="game-panel" aria-label="Tic-Tac-Toe game">
