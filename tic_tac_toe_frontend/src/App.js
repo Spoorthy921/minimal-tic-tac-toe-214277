@@ -1,47 +1,121 @@
-import React, { useState, useEffect } from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useMemo, useState } from "react";
+import "./App.css";
+
+/**
+ * Returns the winner ("X" or "O") for the provided board, or null if no winner.
+ * Board is an array of 9 items, each: "X" | "O" | null.
+ */
+function calculateWinner(board) {
+  const lines = [
+    // rows
+    [0, 1, 2],
+    [3, 4, 5],
+    [6, 7, 8],
+    // columns
+    [0, 3, 6],
+    [1, 4, 7],
+    [2, 5, 8],
+    // diagonals
+    [0, 4, 8],
+    [2, 4, 6],
+  ];
+
+  for (const [a, b, c] of lines) {
+    if (board[a] && board[a] === board[b] && board[a] === board[c]) {
+      return board[a];
+    }
+  }
+  return null;
+}
 
 // PUBLIC_INTERFACE
 function App() {
-  const [theme, setTheme] = useState('light');
+  /** This is the main Tic-Tac-Toe game view. */
+  const [board, setBoard] = useState(() => Array(9).fill(null));
+  const [currentPlayer, setCurrentPlayer] = useState("X");
 
-  // Effect to apply theme to document element
-  useEffect(() => {
-    document.documentElement.setAttribute('data-theme', theme);
-  }, [theme]);
+  const winner = useMemo(() => calculateWinner(board), [board]);
+  const isDraw = useMemo(() => !winner && board.every((c) => c !== null), [board, winner]);
+  const isGameOver = Boolean(winner) || isDraw;
+
+  const statusText = useMemo(() => {
+    if (winner) return `Winner: ${winner}`;
+    if (isDraw) return "Draw";
+    return `Next player: ${currentPlayer}`;
+  }, [winner, isDraw, currentPlayer]);
 
   // PUBLIC_INTERFACE
-  const toggleTheme = () => {
-    setTheme(prevTheme => prevTheme === 'light' ? 'dark' : 'light');
-  };
+  function handleSquareClick(index) {
+    /** Handles user clicks on a square; ignores clicks when invalid or game ended. */
+    if (isGameOver) return;
+    if (board[index] !== null) return;
+
+    setBoard((prev) => {
+      const next = prev.slice();
+      next[index] = currentPlayer;
+      return next;
+    });
+    setCurrentPlayer((p) => (p === "X" ? "O" : "X"));
+  }
+
+  // PUBLIC_INTERFACE
+  function resetGame() {
+    /** Resets board state and sets the current player back to "X". */
+    setBoard(Array(9).fill(null));
+    setCurrentPlayer("X");
+  }
 
   return (
     <div className="App">
-      <header className="App-header">
-        <button 
-          className="theme-toggle" 
-          onClick={toggleTheme}
-          aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
-        >
-          {theme === 'light' ? '🌙 Dark' : '☀️ Light'}
-        </button>
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <p>
-          Current theme: <strong>{theme}</strong>
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <main className="game-shell">
+        <header className="game-header">
+          <h1 className="game-title">Tic-Tac-Toe</h1>
+          <p className="game-subtitle">Retro grid. Clean rules. No quarters required.</p>
+        </header>
+
+        <section className="game-panel" aria-label="Tic-Tac-Toe game">
+          <div className="status-row" role="status" aria-live="polite">
+            <span className={`status-pill ${winner ? "is-win" : isDraw ? "is-draw" : ""}`}>
+              {statusText}
+            </span>
+          </div>
+
+          <div className="board" role="grid" aria-label="3 by 3 board">
+            {board.map((value, idx) => {
+              const isDisabled = isGameOver || value !== null;
+              return (
+                <button
+                  key={idx}
+                  type="button"
+                  className={`square ${value ? "is-filled" : ""} ${
+                    value === "X" ? "is-x" : value === "O" ? "is-o" : ""
+                  }`}
+                  onClick={() => handleSquareClick(idx)}
+                  disabled={isDisabled}
+                  aria-label={`Cell ${idx + 1}${value ? `, ${value}` : ""}`}
+                  role="gridcell"
+                >
+                  <span className="square-mark" aria-hidden="true">
+                    {value ?? ""}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+
+          <div className="controls">
+            <button type="button" className="btn-reset" onClick={resetGame}>
+              Reset
+            </button>
+          </div>
+        </section>
+
+        <footer className="game-footer">
+          <small className="hint">
+            Tip: Click an empty cell to place your mark. Game ends on win or draw.
+          </small>
+        </footer>
+      </main>
     </div>
   );
 }
