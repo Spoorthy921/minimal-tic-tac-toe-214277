@@ -39,10 +39,16 @@ function App() {
   const isGameOver = Boolean(winner) || isDraw;
 
   const statusText = useMemo(() => {
-    if (winner) return `Winner: ${winner}`;
-    if (isDraw) return "Draw";
-    return `Next player: ${currentPlayer}`;
+    if (winner) return `${winner} wins!`;
+    if (isDraw) return "It's a draw.";
+    return `${currentPlayer}'s turn`;
   }, [winner, isDraw, currentPlayer]);
+
+  const statusVariant = useMemo(() => {
+    if (winner) return "is-win";
+    if (isDraw) return "is-draw";
+    return "";
+  }, [winner, isDraw]);
 
   // PUBLIC_INTERFACE
   function handleSquareClick(index) {
@@ -74,15 +80,32 @@ function App() {
         </header>
 
         <section className="game-panel" aria-label="Tic-Tac-Toe game">
-          <div className="status-row" role="status" aria-live="polite">
-            <span className={`status-pill ${winner ? "is-win" : isDraw ? "is-draw" : ""}`}>
+          <div className="status-row" role="status" aria-live="polite" aria-atomic="true">
+            <span
+              className={`status-pill ${statusVariant}`}
+              data-testid="game-status"
+              id="game-status"
+            >
               {statusText}
             </span>
           </div>
 
-          <div className="board" role="grid" aria-label="3 by 3 board">
+          <div
+            className="board"
+            role="grid"
+            aria-label="3 by 3 board"
+            aria-describedby="game-status"
+            data-testid="board"
+          >
             {board.map((value, idx) => {
               const isDisabled = isGameOver || value !== null;
+              const row = Math.floor(idx / 3) + 1;
+              const col = (idx % 3) + 1;
+
+              // For screen readers: keep the label stable and informative.
+              const cellValueText = value ? `, ${value}` : ", empty";
+              const isPlayableText = isDisabled ? ", not playable" : ", playable";
+
               return (
                 <button
                   key={idx}
@@ -92,8 +115,10 @@ function App() {
                   }`}
                   onClick={() => handleSquareClick(idx)}
                   disabled={isDisabled}
-                  aria-label={`Cell ${idx + 1}${value ? `, ${value}` : ""}`}
+                  aria-label={`Row ${row}, column ${col}${cellValueText}${isPlayableText}`}
+                  aria-disabled={isDisabled}
                   role="gridcell"
+                  data-testid={`square-${idx}`}
                 >
                   <span className="square-mark" aria-hidden="true">
                     {value ?? ""}
@@ -112,7 +137,8 @@ function App() {
 
         <footer className="game-footer">
           <small className="hint">
-            Tip: Click an empty cell to place your mark. Game ends on win or draw.
+            Tip: Use Tab to focus a square, then press Enter/Space to play. Game ends on win or
+            draw.
           </small>
         </footer>
       </main>

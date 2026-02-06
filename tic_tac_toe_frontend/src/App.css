@@ -149,6 +149,19 @@
   opacity: 0.98;
 }
 
+/* Visible focus ring for keyboard users */
+.square:focus-visible {
+  outline: 3px solid rgba(6, 182, 212, 0.75);
+  outline-offset: 3px;
+  border-color: rgba(6, 182, 212, 0.55);
+}
+
+.btn-reset:focus-visible {
+  outline: 3px solid rgba(255, 255, 255, 0.95);
+  outline-offset: 3px;
+  filter: brightness(1.03);
+}
+
 .square.is-filled {
   background: linear-gradient(180deg, rgba(249, 250, 251, 0.85), rgba(255, 255, 255, 1));
 }
